@@ -10,7 +10,7 @@ suite('Functional Tests', function () {
   this.timeout(5000);
   suite('Integration tests with chai-http', function () {
     // #1
-    test('Test GET /hello with no name', function (done) {
+    test('/hello', function (done) {
       chai
         .request(server)
         .get('/hello')
@@ -24,10 +24,10 @@ suite('Functional Tests', function () {
     test('Test GET /hello with your name', function (done) {
       chai
         .request(server)
-        .get('/hello?name=xy_z')
+        .get('/hello?name=ggrass')
         .end(function (err, res) {
           assert.equal(res.status, 200);
-          assert.equal(res.text, 'hello xy_z');
+          assert.equal(res.text, 'hello ggrass');
           done();
         });
     });
@@ -36,18 +36,32 @@ suite('Functional Tests', function () {
       chai
         .request(server)
         .put('/travellers')
-
+        .send({
+          "surname": "Colombo"
+        })
         .end(function (err, res) {
-          assert.equal();
-
+          assert.equal(res.status, 200);
+          assert.equal(res.type, 'application/json');
+          assert.equal(res.body.name, "Cristoforo");
+          assert.equal(res.body.surname, "Colombo");
           done();
         });
     });
     // #4
     test('Send {surname: "da Verrazzano"}', function (done) {
-      assert.equal();
-
-      done();
+      chai
+        .request(server)
+        .put('/travellers')
+        .send({
+          surname: "da Verrazzano"
+        })
+        .end((err, res) => {
+          assert.equal(res.status, 200);
+          assert.equal(res.type, 'application/json');
+          assert.equal(res.body.name, "Giovanni");
+          assert.equal(res.body.surname, "da Verrazzano");
+          done();
+        })
     });
   });
 });
@@ -66,19 +80,30 @@ suite("Functional Tests with Zombie.js", function() {
       assert.isNotNull(browser.site);
     });
   });
-
-  suite('"Famous Italian Explorers" form', function () {
+  suite('"Famous Italian Explorers" form', function() {
     // #5
-    test('Submit the surname "Colombo" in the HTML form', function (done) {
-      assert.equal();
-
-      done();
+    test('submit "surname" : "Colombo" - write your e2e test...', function(done) {
+      browser.fill('surname', 'Colombo').then(() => {
+        browser.pressButton('submit', function() {
+          browser.assert.success();
+          browser.assert.text('span#name', 'Cristoforo');
+          browser.assert.text('span#surname', 'Colombo');
+          browser.assert.elements('span#dates', 1);
+          done();
+        });
+      })
     });
     // #6
-    test('Submit the surname "Vespucci" in the HTML form', function (done) {
-      assert.equal();
-
-      done();
+    test('submit "surname" : "Vespucci"', function(done) {
+      browser.fill('surname', 'Vespucci').then(() => {
+        browser.pressButton('submit', () => {
+          browser.assert.success()
+          browser.assert.text('span#name', 'Amerigo')
+          browser.assert.text('span#surname', 'Vespucci')
+          browser.assert.elements('span#dates', 1)
+          done();
+        });
+      });
     });
   });
 });
